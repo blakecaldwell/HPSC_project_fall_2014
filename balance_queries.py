@@ -2,51 +2,41 @@
 import sys, getopt, re
 
 verbose=False
-all_lids=set()
-switch_lids=set()
-hca_lids=set()
-balance_paths=set()
 
 class balancer(object):
+  global verbose
   balanced_work={}
   leftover = []
   def __init__(self,balance_lids):
-    for worker in balance_lids:
+    for worker in balance_lids.iterkeys():
       self.balanced_work[worker] = []
       self.leftover = [] 
-  def add(self,switch,port,worker_lids):
-    # find
-    potential = []
-    for entry in switch.dst[port]:
-      if entry in worker_lids:
-        potential.append(entry)
- 
-    if len(potential) == 0:
-      self.leftover.append((switch.switch_guid,switch.switch_lid,port))
-      if verbose:
-        print "found no potentials for port %s on switch %s" % (port, switch.switch_name )
-      return
-      
+  def add(self,switch,port):
     min = 10000
-    min_key = 0
+    min_key = ''
 
     value_set = False
-    for key in potential:
+    for worker in self.balanced_work:
       if not value_set:
-        min = len(self.balanced_work[key])
+        min = len(self.balanced_work[worker])
         value_set = True
-      elif len(self.balanced_work[key]) < min:
-        min_key = key
-        min = len(self.balanced_work[key])
-    # key now has the lid of the lucky HCA that will get the task
-
-    self.balanced_work[key].append((switch.switch_guid,switch.switch_lid,port))
-  def finalize(self):
-    for key in self.balanced_work.iterkeys():
-      if len(self.leftover) > 0:
-        self.balanced_work[key].append(self.leftover.pop())
       else:
-        return
+        if len(self.balanced_work[worker]) < min:
+          # this test case is not working for some reason
+          min_key = key
+          min = len(self.balanced_work[worker])
+
+    if min_key:
+      self.balanced_work[min_key].append((switch.switch_guid,switch.switch_lid,port))
+    elif verbose:
+      print "found no min key"
+
+  #def finalize(self):
+  #  for key in self.balanced_work.iterkeys():
+  #    if len(self.leftover) > 0:
+  #      self.balanced_work[key].append(self.leftover.pop())
+  #    else:
+  #      return
     #if len(self.leftover) > 0:
     #  self.finalize()
 
@@ -75,10 +65,10 @@ class switch_table(object):
     self.dst={}
   def addPort(self,lid,port):
     if port in self.dst:
-      self.dst[port].append(int(lid,16))
+      self.dst[port].add(int(lid,16))
     else:
-      self.dst[port] = []
-      self.dst[port].append(int(lid,16))
+      self.dst[port] = set()
+      self.dst[port].add(int(lid,16))
     self.nr_dst_lids += 1
     self.nr_ports = len(self.dst)
   def isEmpty(self):
@@ -118,8 +108,13 @@ class switch_table_list(object):
     return count
 
 def balance_paths(data_file, balance_lids):
+  global verbose
+
   my_switches = switch_table_list()
   current_switch = switch_table()
+  all_lids=set()
+  switch_lids=set()
+  hca_lids=set()
  
   f = open(data_file,'r')
 
@@ -150,19 +145,24 @@ def balance_paths(data_file, balance_lids):
         switch_lids.add(int(lid,16))
         current_switch.switch_lid = int(lid,16)
         continue
+      else:
+        hca_lids.add(int(lid,16))
+
       current_switch.addPort(lid,int(port))
     else:
       print "Unrecognized text: %s" % line.rstrip()
 
-  #print "There are %d destinations" % my_switches.countDestinations()
-  #print "There are %d switch ports" % my_switches.countEndpoints()
-  #  my_switches.printList()
-  hca_lids = all_lids.difference(switch_lids)
-  err_lids = balance_lids.difference(hca_lids)
+  if verbose:
+    print "There are %d destinations" % my_switches.countDestinations()
+    print "There are %d switch ports" % my_switches.countEndpoints()
+  #my_switches.printList()
+  #hca_lids = set ( [balance_lids[x] for x in range(0,len(balance_lids)) ] )
+  hca_lids = set(balance_lids.keys())
+  err_lids = hca_lids.difference(all_lids)
   if len(err_lids) > 0:
     for lid in err_lids:
-      print "Could not match up lid %s with a HCA in the fdbs file"
-    balance_lids = balance_lids.intersection(hca_lids)
+      print "Could not match up lid %s of job node with an HCA in the fdbs file"
+      hca_lids = hca_lids.intersection(hca_lids)
 
   # initalize the structure
   myBalancer = balancer(balance_lids)
@@ -170,36 +170,34 @@ def balance_paths(data_file, balance_lids):
   # go down list of switches and put items on balanced_work structure
   for switch in my_switches.switches:
     for port in switch.dst.iterkeys():
-      myBalancer.add(switch,port,balance_lids)
+      port_lids = switch.dst[port]
+      job_lids = set(list(balance_lids.keys()))
+      if len(job_lids.intersection(port_lids)) > 0:
+        myBalancer.add(switch,port)
 
   # Spread out remaining tasks on leftover list
-  myBalancer.finalize()
+  #myBalancer.finalize()
 
-  myBalancer.printout()
+  #myBalancer.printout()
   
-def read_host_lids(lid_file):
-  f = open(lid_file,'r')
-  balance_lids = []
+def read_neighbors(neighbors_file):
+  f = open(neighbors_file,'r')
+  neighbor_dict = {}
   lines = f.readlines()
   for line in lines:
-    try:
-      (srclid,srcport,dstlid,dstport) = line.split(':')
-    except:
-      print "line does not contain an integer: %s"% line
-    balance_lids[int(lid)
+    (srclid,srcport,dstlid,dstport) = line.split(':')
+    neighbor_dict[int(srclid)]={'dstlid' : dstlid, 'dstport' : dstport}
  
-  return balance_lids
+  return neighbor_dict
  
 def main(argv):
   neighbors = ''
   forwardingdb = ''
+  global verbose
 
   try:
-    opts, args = getopt.getopt(argv,"hf:n:",["forwardingdb=","neighbors="])
+    opts, args = getopt.getopt(argv,"vhf:n:",["forwardingdb=","neighbors="])
   except getopt.GetoptError:
-    print '%s.py -f <forwardingdb> -n <neighbors>' % sys.argv[0]
-    sys.exit(2)
-  if len(argv) < 4:
     print '%s.py -f <forwardingdb> -n <neighbors>' % sys.argv[0]
     sys.exit(2)
 
@@ -211,9 +209,11 @@ def main(argv):
       forwardingdb = arg
     elif opt in ("-n", "--neighbors"):
       neighbors = arg
+    elif opt == '-v':
+      verbose = True
 
-  neighbor_lids=read_host_lids(neighbors)
-  balance_paths(forwardingdb,neighbor_lids)
+  neighbor_dict=read_neighbors(neighbors)
+  balance_paths(forwardingdb,neighbor_dict)
 
 if __name__== '__main__':
     main(sys.argv[1:])
