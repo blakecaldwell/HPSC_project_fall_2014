@@ -17,7 +17,7 @@ lidstring = lidnameproc.communicate()[0].rstrip('\n')
 
 mylid = re.search('Base lid: (\d+)', lidstring).group(1)
 
-filelist = glob.glob('/home/dami9546/CSCI5576/project/app_test/host_lids/node*')
+filelist = glob.glob('/home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/host_lids/node*')
 
 for nodefile in filelist:
     with open(nodefile, 'r') as file:
