@@ -1,51 +1,29 @@
 #!/bin/python
 import sys, getopt, re
+import operator
 
 verbose=False
+
 
 class balancer(object):
   global verbose
   balanced_work={}
   leftover = []
+
   def __init__(self,balance_lids):
     for worker in balance_lids.iterkeys():
       self.balanced_work[worker] = []
-      self.leftover = [] 
-  def add(self,switch,port):
-    min = 10000
-    min_key = ''
-
-    value_set = False
-    for worker in self.balanced_work:
-      if not value_set:
-        min = len(self.balanced_work[worker])
-        value_set = True
-      else:
-        if len(self.balanced_work[worker]) < min:
-          # this test case is not working for some reason
-          min_key = key
-          min = len(self.balanced_work[worker])
-
-    if min_key:
-      self.balanced_work[min_key].append((switch.switch_guid,switch.switch_lid,port))
-    elif verbose:
-      print "found no min key"
-
-  #def finalize(self):
-  #  for key in self.balanced_work.iterkeys():
-  #    if len(self.leftover) > 0:
-  #      self.balanced_work[key].append(self.leftover.pop())
-  #    else:
-  #      return
-    #if len(self.leftover) > 0:
-    #  self.finalize()
+      self.leftover = []
+  def add(self,switch_lid,port,candidates):
+    free_worker = min(candidates, key=lambda a: len(self.balanced_work[a]))
+    self.balanced_work[free_worker].append((switch_lid,port))
 
   def printout(self):
     for key in self.balanced_work.iterkeys():
       if len(self.balanced_work[key]) > 0:
         for entry in self.balanced_work[key]:
           sys.stdout.write("%s:"% key)
-          (guid, lid, port) = entry
+          (lid, port) = entry
           sys.stdout.write("%s:%d\n" % (lid, port))
  
 class switch_table(object):
@@ -155,8 +133,8 @@ def balance_paths(data_file, balance_lids):
   if verbose:
     print "There are %d destinations" % my_switches.countDestinations()
     print "There are %d switch ports" % my_switches.countEndpoints()
+
   #my_switches.printList()
-  #hca_lids = set ( [balance_lids[x] for x in range(0,len(balance_lids)) ] )
   hca_lids = set(balance_lids.keys())
   err_lids = hca_lids.difference(all_lids)
   if len(err_lids) > 0:
@@ -167,18 +145,18 @@ def balance_paths(data_file, balance_lids):
   # initalize the structure
   myBalancer = balancer(balance_lids)
 
-  # go down list of switches and put items on balanced_work structure
+
+  # go down list of switches, find candidates, and place on balancer
   for switch in my_switches.switches:
+    candidates = set()
     for port in switch.dst.iterkeys():
       port_lids = switch.dst[port]
       job_lids = set(list(balance_lids.keys()))
-      if len(job_lids.intersection(port_lids)) > 0:
-        myBalancer.add(switch,port)
+      candidates = job_lids.intersection(port_lids)
+      if len(candidates) > 0:
+        myBalancer.add(switch.switch_lid,port,candidates)
 
-  # Spread out remaining tasks on leftover list
-  #myBalancer.finalize()
-
-  #myBalancer.printout()
+  myBalancer.printout()
   
 def read_neighbors(neighbors_file):
   f = open(neighbors_file,'r')
