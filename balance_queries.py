@@ -14,17 +14,28 @@ class balancer(object):
     for worker in balance_lids.iterkeys():
       self.balanced_work[worker] = []
       self.leftover = []
-  def add(self,switch_lid,port,candidates):
-    free_worker = min(candidates, key=lambda a: len(self.balanced_work[a]))
-    self.balanced_work[free_worker].append((switch_lid,port))
+  def add(self,switch_lid,port,candidates=None):
+    very_free_worker = min(self.balanced_work.keys(), key=lambda a: len(self.balanced_work[a]))
+    global_min_len = len(self.balanced_work[very_free_worker])
+    if candidates:
+      free_worker = min(candidates, key=lambda a: len(self.balanced_work[a]))
+      if (not free_worker) or (not free_worker in self.balanced_work.keys()):
+        print "This should not have happened: could not find worker on candidate list"
+        return 0
+      candidate_len = len(self.balanced_work[free_worker])
+      if candidate_len > global_min_len + 4:
+        return 0
+      else:
+        self.balanced_work[free_worker].append((switch_lid,port))
+        return 1
+    else:
+      self.balanced_work[very_free_worker].append((switch_lid,port))
+      return 1
 
   def printout(self):
     for key in self.balanced_work.iterkeys():
-      if len(self.balanced_work[key]) > 0:
-        for entry in self.balanced_work[key]:
-          sys.stdout.write("%s:"% key)
-          (lid, port) = entry
-          sys.stdout.write("%s:%d\n" % (lid, port))
+      for entry in self.balanced_work[key]:
+        print "%s:%s:%d" % (key, entry[0], entry[1])
  
 class switch_table(object):
   def __init__(self):
@@ -148,23 +159,47 @@ def balance_paths(data_file, balance_lids):
 
   # go down list of switches, find candidates, and place on balancer
   for switch in my_switches.switches:
-    candidates = set()
     for port in switch.dst.iterkeys():
+      added = 0
+      # check if a direct neighbor is found
+      for potential_neighbor in balance_lids.iterkeys():
+        if (balance_lids[potential_neighbor]['dstlid'] == switch.switch_lid) and (balance_lids[potential_neighbor]['dstport'] == int(port)) :
+           added = myBalancer.add(switch.switch_lid,port,set([potential_neighbor]))
+           if added == 1:
+             if verbose:
+               print "added lid %d for switch %d:%d" % (potential_neighbor,switch.switch_lid,port)
+             continue
+           else:
+             print "Shouldn't have happened: failed to add lid %d for switch %d:%d" % (potential_neighbor,switch.switch_lid,port)
+      # break out of second for loop if added the neighbor
+      if added == 1:
+        continue
+      # try to find port in neighbor list
       port_lids = switch.dst[port]
       job_lids = set(list(balance_lids.keys()))
-      candidates = job_lids.intersection(port_lids)
-      if len(candidates) > 0:
-        myBalancer.add(switch.switch_lid,port,candidates)
+      candidates = list(job_lids.intersection(port_lids))
+      # only if there are candidates
+      if candidates:
+        added = myBalancer.add(switch.switch_lid,port,candidates)
+        if added == 1:
+          if verbose:
+            print "added from candidate list %s for switch %d:%d" % (candidates,switch.switch_lid,port)
+          continue
+        # just add no matter what
+        myBalancer.add(switch.switch_lid,port)
+        if verbose:
+          print "added switch %d:%d" % (switch.switch_lid,port)
 
-  myBalancer.printout()
+  if not verbose:
+    myBalancer.printout()
   
 def read_neighbors(neighbors_file):
   f = open(neighbors_file,'r')
   neighbor_dict = {}
   lines = f.readlines()
   for line in lines:
-    (srclid,srcport,dstlid,dstport) = line.split(':')
-    neighbor_dict[int(srclid)]={'dstlid' : dstlid, 'dstport' : dstport}
+    (srclid,srcport,dstport,dstlid) = line.split(':')
+    neighbor_dict[int(srclid)]={'dstlid' : int(dstlid), 'dstport' : int(dstport)}
  
   return neighbor_dict
  
