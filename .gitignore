@@ -1,0 +1,18 @@
+tau-2.24/*
+.snapshot
+logs/*
+perfqueries/*
+.nfs*
+fts.out.2014*
+neighbors.2014*
+github.repo
+balance.out
+job_nodes
+lids_of_job_members
+
+# But not these files...
+!tau-2.24/src/Profile/TauMpi.c
+# etc...
+
+# ...even if they are in subdirectories
+!tau-2.24/
