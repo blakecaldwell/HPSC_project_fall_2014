@@ -10,4 +10,4 @@ echo "${hostname} ${lid}" > /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_t
 
 sleep 90
 
-python /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/app_routes.py >> /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/host_routes/${hostname}_$1
+python /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/app_routes.py >> /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/host_routes/${hostname}_$( date +"%Y%m%d-%s" )_$1
