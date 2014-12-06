@@ -8,6 +8,7 @@ if [ ! -d logs ]; then
 fi
 
 START_TIME=$(date '+%Y%m%d%H%M')
+echo "Starting perfqueries on %{HOSTNAME} at $(date +"%T.%N")" >> logs/${HOSTNAME}_perfquery_${START_TIME}.log
 DIR=perfqueries
 OLDIFS=$IFS
 IFS=$'\n'
