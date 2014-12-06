@@ -4,8 +4,7 @@ logs/*
 tmp/*
 perfqueries/*
 .nfs*
-fts.out.2014*
-neighbors.2014*
+slurm*
 balance.out.2014*
 job_nodes
 lids_of_job_members
