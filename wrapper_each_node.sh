@@ -8,6 +8,9 @@ die() {
 START_TIME=$1
 [ $START_TIME ] || die "the first argument must be the START_TIME"
 
+LOOP_DELAY=$2
+[ $LOOP_DELAY ] || die "the second argument must be the LOOP_DELAY"
+
 cd /projects/caldweba/
 
 if [ ! -e balance.out.$START_TIME ]; then
@@ -18,7 +21,7 @@ fi
 # This will take balance.out and split it into the individual files the node is responsible for in 
 #  /projects/caldweba/perfqueries/
 
-./spawn_queries.sh $START_TIME
+./spawn_queries.sh $START_TIME $LOOP_DELAY
 # This will spawn N jobs in the background (where N is wc -l perfqueries/$HOSTNAME_perfqueries
 #   and then wait until that sweep is complete. It writes the output to /projects/caldweba/logs/
 #   It will loop forever until it is killed (by the slurm script)
