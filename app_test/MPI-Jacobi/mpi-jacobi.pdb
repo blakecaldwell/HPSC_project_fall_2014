@@ -1,0 +1,585 @@
+<PDB 3.0>
+lang fortran
+
+so#0 mpi-jacobi.f90
+
+ro#1 COPYRECVBUF
+rsig ty#30
+rstart so#0 302 5
+rloc so#0 292 3
+rpos so#0 292 3 so#0 292 3 so#0 356 28 so#0 356 28
+rlink f90
+rkind fext
+rstmt st#0 fif so#0 302 5 so#0 318 9 st#8 st#1 
+rstmt st#1 fif so#0 303 7 so#0 317 11 NA st#2 st#5 
+rstmt st#2 fdo so#0 305 9 so#0 309 13 NA st#3 
+rstmt st#3 fdo so#0 306 11 so#0 308 15 NA st#4 
+rstmt st#4 fassign so#0 307 13 so#0 307 62 NA NA 
+rstmt st#5 fdo so#0 312 9 so#0 316 13 NA st#6 
+rstmt st#6 fdo so#0 313 11 so#0 315 15 NA st#7 
+rstmt st#7 fassign so#0 314 13 so#0 314 64 NA NA 
+rstmt st#8 fif so#0 320 5 so#0 336 9 st#16 st#9 
+rstmt st#9 fif so#0 321 7 so#0 335 11 NA st#10 st#13 
+rstmt st#10 fdo so#0 323 9 so#0 327 13 NA st#11 
+rstmt st#11 fdo so#0 324 11 so#0 326 15 NA st#12 
+rstmt st#12 fassign so#0 325 13 so#0 325 62 NA NA 
+rstmt st#13 fdo so#0 330 9 so#0 334 13 NA st#14 
+rstmt st#14 fdo so#0 331 11 so#0 333 15 NA st#15 
+rstmt st#15 fassign so#0 332 13 so#0 332 64 NA NA 
+rstmt st#16 fif so#0 338 5 so#0 354 9 st#24 st#17 
+rstmt st#17 fif so#0 339 7 so#0 353 11 NA st#18 st#21 
+rstmt st#18 fdo so#0 341 9 so#0 345 13 NA st#19 
+rstmt st#19 fdo so#0 342 11 so#0 344 15 NA st#20 
+rstmt st#20 fassign so#0 343 13 so#0 343 62 NA NA 
+rstmt st#21 fdo so#0 348 9 so#0 352 13 NA st#22 
+rstmt st#22 fdo so#0 349 11 so#0 351 15 NA st#23 
+rstmt st#23 fassign so#0 350 13 so#0 350 64 NA NA 
+rstmt st#24 freturn so#0 356 3 so#0 356 28 NA NA 
+rbody st#0
+
+ro#2 COPYSENDBUF
+rsig ty#45
+rstart so#0 235 5
+rloc so#0 225 3
+rpos so#0 225 3 so#0 225 3 so#0 290 28 so#0 290 28
+rlink f90
+rkind fext
+rstmt st#0 fif so#0 235 5 so#0 252 9 st#8 st#1 
+rstmt st#1 fif so#0 236 7 so#0 251 11 NA st#2 st#5 
+rstmt st#2 fdo so#0 238 9 so#0 242 13 NA st#3 
+rstmt st#3 fdo so#0 239 11 so#0 241 15 NA st#4 
+rstmt st#4 fassign so#0 240 13 so#0 240 66 NA NA 
+rstmt st#5 fdo so#0 246 9 so#0 250 13 NA st#6 
+rstmt st#6 fdo so#0 247 11 so#0 249 15 NA st#7 
+rstmt st#7 fassign so#0 248 13 so#0 248 68 NA NA 
+rstmt st#8 fif so#0 254 5 so#0 270 9 st#16 st#9 
+rstmt st#9 fif so#0 255 7 so#0 269 11 NA st#10 st#13 
+rstmt st#10 fdo so#0 257 9 so#0 261 13 NA st#11 
+rstmt st#11 fdo so#0 258 11 so#0 260 15 NA st#12 
+rstmt st#12 fassign so#0 259 13 so#0 259 66 NA NA 
+rstmt st#13 fdo so#0 264 9 so#0 268 13 NA st#14 
+rstmt st#14 fdo so#0 265 11 so#0 267 15 NA st#15 
+rstmt st#15 fassign so#0 266 13 so#0 266 68 NA NA 
+rstmt st#16 fif so#0 272 5 so#0 288 9 st#24 st#17 
+rstmt st#17 fif so#0 273 7 so#0 287 11 NA st#18 st#21 
+rstmt st#18 fdo so#0 275 9 so#0 279 13 NA st#19 
+rstmt st#19 fdo so#0 276 11 so#0 278 15 NA st#20 
+rstmt st#20 fassign so#0 277 13 so#0 277 66 NA NA 
+rstmt st#21 fdo so#0 282 9 so#0 286 13 NA st#22 
+rstmt st#22 fdo so#0 283 11 so#0 285 15 NA st#23 
+rstmt st#23 fassign so#0 284 13 so#0 284 68 NA NA 
+rstmt st#24 freturn so#0 290 3 so#0 290 28 NA NA 
+rbody st#0
+
+ro#6 JACOBI_SWEEP
+rsig ty#2
+rstart so#0 403 3
+rloc so#0 395 3
+rpos so#0 395 3 so#0 395 3 so#0 417 29 so#0 417 29
+rlink f90
+rkind fext
+rstmt st#0 fassign so#0 403 3 so#0 403 15 st#1 NA 
+rstmt st#1 fdo so#0 406 3 so#0 414 7 st#5 st#2 
+rstmt st#2 fdo so#0 407 5 so#0 413 9 NA st#3 
+rstmt st#3 fdo so#0 408 7 so#0 412 11 NA st#4 
+rstmt st#4 fassign so#0 409 9 so#0 411 74 NA NA 
+rstmt st#5 fassign so#0 416 3 so#0 416 55 st#6 NA 
+rstmt st#6 freturn so#0 417 3 so#0 417 29 NA NA 
+rbody st#0
+
+ro#18 MPI_JACOBI
+rsig ty#0
+rstart so#0 35 3
+rloc so#0 5 1
+rpos so#0 5 1 so#0 5 1 so#0 419 22 so#0 419 22
+rlink f90
+rkind fprog
+rstmt st#0 fcall so#0 35 3 so#0 35 23 st#1 NA 
+rstmt st#1 fcall so#0 36 3 so#0 36 53 st#2 NA 
+rstmt st#2 fcall so#0 37 3 so#0 37 54 st#3 NA 
+rstmt st#3 fif so#0 41 3 so#0 72 7 st#29 st#4 
+rstmt st#4 fcall so#0 45 5 so#0 45 45 st#5 NA 
+rstmt st#5 fio so#0 46 5 so#0 46 35 st#6 NA 
+rstmt st#6 fcall so#0 47 5 so#0 47 45 st#7 NA 
+rstmt st#7 fio so#0 48 5 so#0 48 35 st#8 NA 
+rstmt st#8 fcall so#0 49 5 so#0 49 45 st#9 NA 
+rstmt st#9 fio so#0 50 5 so#0 50 35 st#10 NA 
+rstmt st#10 fcall so#0 51 5 so#0 51 45 st#11 NA 
+rstmt st#11 fio so#0 52 5 so#0 52 37 st#12 NA 
+rstmt st#12 fcall so#0 53 5 so#0 53 46 st#13 NA 
+rstmt st#13 fio so#0 54 5 so#0 54 37 st#14 NA 
+rstmt st#14 fcall so#0 55 5 so#0 55 46 st#15 NA 
+rstmt st#15 fio so#0 56 5 so#0 56 38 st#16 NA 
+rstmt st#16 fcall so#0 57 5 so#0 57 46 st#17 NA 
+rstmt st#17 fio so#0 58 5 so#0 58 38 st#18 NA 
+rstmt st#18 fcall so#0 59 5 so#0 59 46 st#19 NA 
+rstmt st#19 fio so#0 60 5 so#0 60 36 st#20 NA 
+rstmt st#20 fcall so#0 61 5 so#0 61 46 st#21 NA 
+rstmt st#21 fio so#0 62 5 so#0 62 39 st#22 NA 
+rstmt st#22 fcall so#0 63 5 so#0 63 46 st#23 NA 
+rstmt st#23 fio so#0 64 5 so#0 64 36 st#24 NA 
+rstmt st#24 fassign so#0 66 5 so#0 66 20 st#25 NA 
+rstmt st#25 fassign so#0 67 5 so#0 67 26 st#26 NA 
+rstmt st#26 fassign so#0 68 5 so#0 68 26 st#27 NA 
+rstmt st#27 fassign so#0 69 5 so#0 69 26 st#28 NA 
+rstmt st#28 fassign so#0 70 5 so#0 70 26 NA NA 
+rstmt st#29 fcall so#0 75 3 so#0 75 73 st#30 NA 
+rstmt st#30 fcall so#0 76 3 so#0 76 70 st#31 NA 
+rstmt st#31 fcall so#0 77 3 so#0 77 70 st#32 NA 
+rstmt st#32 fcall so#0 78 3 so#0 78 65 st#33 NA 
+rstmt st#33 fcall so#0 79 3 so#0 79 65 st#34 NA 
+rstmt st#34 fcall so#0 80 3 so#0 80 65 st#35 NA 
+rstmt st#35 fcall so#0 81 3 so#0 81 66 st#36 NA 
+rstmt st#36 fcall so#0 82 3 so#0 82 74 st#37 NA 
+rstmt st#37 fcall so#0 83 3 so#0 83 74 st#38 NA 
+rstmt st#38 fcall so#0 84 3 so#0 84 75 st#39 NA 
+rstmt st#39 fcall so#0 85 3 so#0 85 75 st#40 NA 
+rstmt st#40 fcall so#0 86 3 so#0 86 73 st#41 NA 
+rstmt st#41 fcall so#0 87 3 so#0 87 76 st#42 NA 
+rstmt st#42 fcall so#0 91 3 so#0 91 54 st#43 NA 
+rstmt st#43 fassign so#0 93 3 so#0 93 18 st#44 NA 
+rstmt st#44 fcall so#0 94 3 so#0 95 48 st#45 NA 
+rstmt st#45 fcall so#0 99 3 so#0 99 59 st#46 NA 
+rstmt st#46 fcall so#0 100 3 so#0 100 60 st#47 NA 
+rstmt st#47 fcall so#0 101 3 so#0 101 80 st#48 NA 
+rstmt st#48 fcall so#0 103 3 so#0 103 23 st#49 NA 
+rstmt st#49 fio so#0 104 3 so#0 104 76 st#50 NA 
+rstmt st#50 fdo so#0 107 3 so#0 112 7 st#54 st#51 
+rstmt st#51 fassign so#0 108 5 so#0 108 47 st#52 NA 
+rstmt st#52 fif so#0 109 5 so#0 111 9 NA st#53 
+rstmt st#53 fassign so#0 110 7 so#0 110 37 NA NA 
+rstmt st#54 fassign so#0 114 3 so#0 114 12 st#55 NA 
+rstmt st#55 fassign so#0 114 15 so#0 114 37 st#56 NA 
+rstmt st#56 fassign so#0 115 3 so#0 115 12 st#57 NA 
+rstmt st#57 fassign so#0 115 15 so#0 115 37 st#58 NA 
+rstmt st#58 fassign so#0 116 3 so#0 116 12 st#59 NA 
+rstmt st#59 fassign so#0 116 15 so#0 116 37 st#60 NA 
+rstmt st#60 fallocate so#0 120 3 so#0 120 59 st#61 NA 
+rstmt st#61 fassign so#0 121 3 so#0 121 21 st#62 NA 
+rstmt st#62 fassign so#0 124 3 so#0 124 12 st#63 NA 
+rstmt st#63 fassign so#0 125 3 so#0 125 40 st#64 NA 
+rstmt st#64 fassign so#0 126 3 so#0 126 34 st#65 NA 
+rstmt st#65 fassign so#0 128 3 so#0 128 40 st#66 NA 
+rstmt st#66 fassign so#0 129 3 so#0 129 34 st#67 NA 
+rstmt st#67 fassign so#0 131 3 so#0 131 40 st#68 NA 
+rstmt st#68 fassign so#0 132 3 so#0 132 34 st#69 NA 
+rstmt st#69 fallocate so#0 134 3 so#0 134 31 st#70 NA 
+rstmt st#70 fallocate so#0 135 3 so#0 135 31 st#71 NA 
+rstmt st#71 fassign so#0 136 3 so#0 136 21 st#72 NA 
+rstmt st#72 fassign so#0 136 24 so#0 136 42 st#73 NA 
+rstmt st#73 fif so#0 138 3 so#0 141 7 st#76 st#74 
+rstmt st#74 fcall so#0 139 5 so#0 139 25 st#75 NA 
+rstmt st#75 fio so#0 140 5 so#0 140 58 NA NA 
+rstmt st#76 fassign so#0 144 3 so#0 144 12 st#77 NA 
+rstmt st#77 fassign so#0 144 15 so#0 144 23 st#78 NA 
+rstmt st#78 fassign so#0 145 3 so#0 145 8 st#79 NA 
+rstmt st#79 fassign so#0 145 11 so#0 145 16 st#80 NA 
+rstmt st#80 fassign so#0 146 3 so#0 146 9 st#81 NA 
+rstmt st#81 fdo so#0 147 3 so#0 211 7 st#106 st#82 
+rstmt st#82 fdo so#0 148 5 so#0 194 9 st#98 st#83 
+rstmt st#83 fdo so#0 149 7 so#0 193 11 NA st#84 
+rstmt st#84 fcall so#0 152 9 so#0 152 28 st#85 NA 
+rstmt st#85 fcall so#0 154 9 so#0 155 41 st#86 NA 
+rstmt st#86 fif so#0 158 9 so#0 168 13 st#90 st#87 st#88 
+rstmt st#87 fcall so#0 159 11 so#0 162 53 NA NA 
+rstmt st#88 fif so#0 164 9 so#0 168 13 NA st#89 
+rstmt st#89 fcall so#0 165 11 so#0 167 57 NA NA 
+rstmt st#90 fif so#0 170 9 so#0 183 13 st#95 st#91 st#92 
+rstmt st#91 fcall so#0 171 11 so#0 174 53 NA NA 
+rstmt st#92 fif so#0 175 9 so#0 183 13 NA st#93 
+rstmt st#93 fcall so#0 176 11 so#0 178 69 st#94 NA 
+rstmt st#94 fcall so#0 180 11 so#0 181 59 NA NA 
+rstmt st#95 fif so#0 185 9 so#0 191 13 NA st#96 
+rstmt st#96 fcall so#0 186 11 so#0 186 46 st#97 NA 
+rstmt st#97 fcall so#0 188 11 so#0 190 69 NA NA 
+rstmt st#98 fcall so#0 197 5 so#0 198 67 st#99 NA 
+rstmt st#99 fcall so#0 201 5 so#0 202 56 st#100 NA 
+rstmt st#100 fcall so#0 205 5 so#0 205 24 st#101 NA 
+rstmt st#101 fassign so#0 207 5 so#0 207 14 st#102 NA 
+rstmt st#102 fassign so#0 208 5 so#0 208 18 st#103 NA 
+rstmt st#103 fassign so#0 210 5 so#0 210 10 st#104 NA 
+rstmt st#104 fassign so#0 210 13 so#0 210 17 st#105 NA 
+rstmt st#105 fassign so#0 210 20 so#0 210 25 NA NA 
+rstmt st#106 fif so#0 213 3 so#0 215 7 st#108 st#107 
+rstmt st#107 fio so#0 214 5 so#0 214 68 NA NA 
+rstmt st#108 fcall so#0 218 3 so#0 218 27 st#109 NA 
+rstmt st#109 fdeallocate so#0 221 3 so#0 221 39 st#110 NA 
+rstmt st#110 freturn so#0 223 1 so#0 223 8 NA NA 
+rbody st#0
+
+ro#22 SETBOUNDARIES
+rsig ty#12
+rstart so#0 369 5
+rloc so#0 358 3
+rpos so#0 358 3 so#0 358 3 so#0 393 30 so#0 393 30
+rlink f90
+rkind fext
+rstmt st#0 fif so#0 369 5 so#0 375 9 st#5 st#1 
+rstmt st#1 fif so#0 370 7 so#0 374 11 NA st#2 st#3 
+rstmt st#2 fassign so#0 371 9 so#0 371 54 NA NA 
+rstmt st#3 fif so#0 372 7 so#0 374 11 NA st#4 
+rstmt st#4 fassign so#0 373 9 so#0 373 56 NA NA 
+rstmt st#5 fif so#0 377 5 so#0 383 9 st#10 st#6 
+rstmt st#6 fif so#0 378 7 so#0 382 11 NA st#7 st#8 
+rstmt st#7 fassign so#0 379 9 so#0 379 52 NA NA 
+rstmt st#8 fif so#0 380 7 so#0 382 11 NA st#9 
+rstmt st#9 fassign so#0 381 9 so#0 381 57 NA NA 
+rstmt st#10 fif so#0 385 5 so#0 391 9 st#15 st#11 
+rstmt st#11 fif so#0 386 7 so#0 390 11 NA st#12 st#13 
+rstmt st#12 fassign so#0 387 9 so#0 387 53 NA NA 
+rstmt st#13 fif so#0 388 7 so#0 390 11 NA st#14 
+rstmt st#14 fassign so#0 389 9 so#0 389 55 NA NA 
+rstmt st#15 freturn so#0 393 3 so#0 393 30 NA NA 
+rbody st#0
+
+ty#1 void
+yacs priv
+ykind fvoid
+
+ty#0 void ()
+yacs priv
+ykind ffunc
+yrett ty#1
+
+ty#3 void
+yacs priv
+ykind fvoid
+
+ty#5 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#4 double[]
+yacs priv
+ykind farray
+yelem ty#5
+yshape explicit
+yrank 4
+
+ty#6 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#7 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#8 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#9 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#10 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#11 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#2 void (phi, nx, ny, nz, t0, t1, maxdelta)
+yacs priv
+ykind ffunc
+yrett ty#3
+yargt ty#4 phi
+yargt ty#6 nx
+yargt ty#7 ny
+yargt ty#8 nz
+yargt ty#9 t0
+yargt ty#10 t1
+yargt ty#11 maxdelta
+
+ty#13 void
+yacs priv
+ykind fvoid
+
+ty#15 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#14 double[]
+yacs priv
+ykind farray
+yelem ty#15
+yshape explicit
+yrank 4
+
+ty#16 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#17 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#18 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#19 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#20 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#21 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#22 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#23 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#24 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#25 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#26 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#27 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#28 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#29 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#12 void (phi, istart, jstart, kstart, iend, jend, kend, displ, direction, north, south, east, west, top, bottom)
+yacs priv
+ykind ffunc
+yrett ty#13
+yargt ty#14 phi
+yargt ty#16 istart
+yargt ty#17 jstart
+yargt ty#18 kstart
+yargt ty#19 iend
+yargt ty#20 jend
+yargt ty#21 kend
+yargt ty#22 displ
+yargt ty#23 direction
+yargt ty#24 north
+yargt ty#25 south
+yargt ty#26 east
+yargt ty#27 west
+yargt ty#28 top
+yargt ty#29 bottom
+
+ty#31 void
+yacs priv
+ykind fvoid
+
+ty#33 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#32 double[]
+yacs priv
+ykind farray
+yelem ty#33
+yshape explicit
+yrank 4
+
+ty#34 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#35 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#36 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#37 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#38 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#39 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#40 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#41 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#43 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#42 double[]
+yacs priv
+ykind farray
+yelem ty#43
+yshape explicit
+yrank 1
+
+ty#44 int64
+yacs priv
+ykind fint
+yikind ulong
+
+ty#30 void (phi, istart, jstart, kstart, iend, jend, kend, displ, direction, fieldrecv, buflen)
+yacs priv
+ykind ffunc
+yrett ty#31
+yargt ty#32 phi
+yargt ty#34 istart
+yargt ty#35 jstart
+yargt ty#36 kstart
+yargt ty#37 iend
+yargt ty#38 jend
+yargt ty#39 kend
+yargt ty#40 displ
+yargt ty#41 direction
+yargt ty#42 fieldrecv
+yargt ty#44 buflen
+
+ty#46 void
+yacs priv
+ykind fvoid
+
+ty#48 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#47 double[]
+yacs priv
+ykind farray
+yelem ty#48
+yshape explicit
+yrank 4
+
+ty#49 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#50 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#51 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#52 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#53 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#54 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#55 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#56 int32
+yacs priv
+ykind fint
+yikind int
+
+ty#58 double
+yacs priv
+ykind ffloat
+yfkind dbl
+
+ty#57 double[]
+yacs priv
+ykind farray
+yelem ty#58
+yshape explicit
+yrank 1
+
+ty#59 int64
+yacs priv
+ykind fint
+yikind ulong
+
+ty#45 void (phi, istart, jstart, kstart, iend, jend, kend, displ, direction, fieldsend, buflen)
+yacs priv
+ykind ffunc
+yrett ty#46
+yargt ty#47 phi
+yargt ty#49 istart
+yargt ty#50 jstart
+yargt ty#51 kstart
+yargt ty#52 iend
+yargt ty#53 jend
+yargt ty#54 kend
+yargt ty#55 displ
+yargt ty#56 direction
+yargt ty#57 fieldsend
+yargt ty#59 buflen
+

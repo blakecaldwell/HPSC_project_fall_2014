@@ -21,10 +21,15 @@ module load HPSC_CLASS2014/hw06
 
 export TAU_TRACE=1
 
-srun -N80 /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/wrapper.sh begin
+srun -N $(scontrol show hostname ${SLUM_NODELIST}) /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/wrapper.sh start
+
+/home/dami9546/CSCI5576/HPSC_project_fall_2014/wrapper_once.sh
 
 cd /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/MPI-Jacobi
 
+srun -N $(scontrol show hostname ${SLUM_NODELIST}) /projects/caldweba/wrapper_each_node.sh
+
 tau_exec mpirun -np 12 ./mpi-jacobi.exe -imax 3440 -jmax 3440 -kmax 3440 -east 0 -west 0 -north 1 -south 0 -top 0 -bottom 0 -niter 1000
 
-srun -N80 /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/wrapper.sh end 
+srun -N $(scontrol show hostname ${SLUM_NODELIST}) /home/dami9546/CSCI5576/HPSC_project_fall_2014/app_test/wrapper.sh end
+

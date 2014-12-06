@@ -27,6 +27,8 @@ PROGRAM mpi_jacobi
   ! false below
   LOGICAL :: reorder ! set to true below.
   CHARACTER(len=100) :: char_buffer
+  CHARACTER(len=100) :: hostname
+  INTEGER(KIND=8) :: epoch_time
 
 !  ierror = 0
 ! Start MPI
@@ -98,6 +100,8 @@ PROGRAM mpi_jacobi
   CALL MPI_Comm_size(CART_COMM_WORLD, numProcs_cart, ierror)
   CALL MPI_Cart_coords(CART_COMM_WORLD, my_rank_cart, 3, my_cart_coords, ierror)
 
+  CALL HOSTNM(hostname)
+  WRITE(*,"(A15,A15,A15,I1)") "Hostname:",hostname,"Cart_rank:",my_rank_cart
 
 ! Set up local subdomains.
   DO i = 1, 3
@@ -130,6 +134,11 @@ PROGRAM mpi_jacobi
   ALLOCATE(fieldRecv(1:bufLen))
   ALLOCATE(fieldSend(1:bufLen))
   fieldSend(:) = 0.d0; fieldRecv(:) = 0.d0
+
+  IF(my_rank.EQ.0) THEN 
+    CALL Time(epoch_time)
+    WRITE(*,*) "Beginning of loop epoch time:",epoch_time 
+  ENDIF
 
 ! Now the main loop.  Adapted from Hager's text.
   WTT = 0.d0; WT = 0.d0

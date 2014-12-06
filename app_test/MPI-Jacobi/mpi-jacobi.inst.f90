@@ -27,6 +27,8 @@ PROGRAM mpi_jacobi
   ! false below
   LOGICAL :: reorder ! set to true below.
   CHARACTER(len=100) :: char_buffer
+  CHARACTER(len=100) :: hostname
+  INTEGER(KIND=8) :: epoch_time
 
 !  ierror = 0
 ! Start MPI
@@ -36,7 +38,7 @@ PROGRAM mpi_jacobi
 
       call TAU_PROFILE_INIT()
       call TAU_PROFILE_TIMER(profiler, '                                &
-     &MPI_JACOBI [{mpi-jacobi.f90} {5,1}-{410,22}]')
+     &MPI_JACOBI [{mpi-jacobi.f90} {5,1}-{419,22}]')
   	
 	call TAU_PROFILE_START(profiler)
       CALL MPI_Init(ierror)
@@ -107,6 +109,8 @@ PROGRAM mpi_jacobi
   CALL MPI_Comm_size(CART_COMM_WORLD, numProcs_cart, ierror)
   CALL MPI_Cart_coords(CART_COMM_WORLD, my_rank_cart, 3, my_cart_coords, ierror)
 
+  CALL HOSTNM(hostname)
+  WRITE(*,"(A15,A15,A15,I1)") "Hostname:",hostname,"Cart_rank:",my_rank_cart
 
 ! Set up local subdomains.
   DO i = 1, 3
@@ -139,6 +143,11 @@ PROGRAM mpi_jacobi
   ALLOCATE(fieldRecv(1:bufLen))
   ALLOCATE(fieldSend(1:bufLen))
   fieldSend(:) = 0.d0; fieldRecv(:) = 0.d0
+
+  IF(my_rank.EQ.0) THEN 
+    CALL Time(epoch_time)
+    WRITE(*,*) "Beginning of loop epoch time:",epoch_time 
+  ENDIF
 
 ! Now the main loop.  Adapted from Hager's text.
   WTT = 0.d0; WT = 0.d0
@@ -238,7 +247,7 @@ CONTAINS
       save profiler
 
       call TAU_PROFILE_TIMER(profiler, '                                &
-     &COPYSENDBUF [{mpi-jacobi.f90} {216,3}-{281,28}]')
+     &COPYSENDBUF [{mpi-jacobi.f90} {225,3}-{290,28}]')
     	
 	call TAU_PROFILE_START(profiler)
       IF(direction.EQ.1) THEN 
@@ -314,7 +323,7 @@ CONTAINS
       save profiler
 
       call TAU_PROFILE_TIMER(profiler, '                                &
-     &COPYRECVBUF [{mpi-jacobi.f90} {283,3}-{347,28}]')
+     &COPYRECVBUF [{mpi-jacobi.f90} {292,3}-{356,28}]')
     	
 	call TAU_PROFILE_START(profiler)
       IF(direction.EQ.1) THEN 
@@ -390,7 +399,7 @@ CONTAINS
       save profiler
 
       call TAU_PROFILE_TIMER(profiler, '                                &
-     &SETBOUNDARIES [{mpi-jacobi.f90} {349,3}-{384,30}]')
+     &SETBOUNDARIES [{mpi-jacobi.f90} {358,3}-{393,30}]')
     	
 	call TAU_PROFILE_START(profiler)
       IF(direction.EQ.1) THEN ! i (j,k plane)
@@ -433,7 +442,7 @@ CONTAINS
       save profiler
 
       call TAU_PROFILE_TIMER(profiler, '                                &
-     &JACOBI_SWEEP [{mpi-jacobi.f90} {386,3}-{408,29}]')
+     &JACOBI_SWEEP [{mpi-jacobi.f90} {395,3}-{417,29}]')
   	
 	call TAU_PROFILE_START(profiler)
       D = 1.d0/6.d0
