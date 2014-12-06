@@ -1,12 +1,11 @@
 tau-2.24/*
 .snapshot
 logs/*
+tmp/*
 perfqueries/*
 .nfs*
-fts.out.2014*
-neighbors.2014*
-github.repo
-balance.out
+slurm*
+balance.out.2014*
 job_nodes
 lids_of_job_members
 
