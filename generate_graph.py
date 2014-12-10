@@ -24,6 +24,9 @@ class DAG(object):
 		# Defaultdict must be callable, so use lambda
 		rank_dict = defaultdict(lambda: defaultdict(dict))
 
+		# Initialize the graph
+		G = nx.DiGraph()
+
 		with open(self.filename, 'r') as infile:
 			strings1 = ("name=MPI_Send()", "Primitive")
 			strings2 = ("name=MPI_Wait()", "Primitive")
@@ -33,6 +36,7 @@ class DAG(object):
 
 			for line in infile:
 
+				# Do for MPI_Send
 				if all(x in line for x in strings1):
 					# Parse the string to get important values
 					event = re.search('^([0-9]+)', line).group(1)
@@ -45,13 +49,40 @@ class DAG(object):
 					t_grp = re.search('TimeBBox\((\d+.\d+),(\d+.\d+)\)', line)
 					tBBox = [float(t_grp.group(1)), float(t_grp.group(2))]
 
-					# Assemble the dictionary and add to event_btree
+					# Assemble the dictionary and add to defaultdict(defaultdict(OOBtree))
 					attr_dict = {'dest':dest, 'msg_size':size, 'tBBox_s':tBBox[0],
 									'tBBox_e':tBBox[1]}
 
 					rank_dict[source]['MPI_Send'][event] = attr_dict
-					# Test
-					#print rank_dict[source]['MPI_Send'][event], event, source
+
+					# Now add node to nascent graph.
+					node_name = '_'.join((str(source), str(event)))
+					G.add_node(node_name)
+			
+				# Do for MPI_Wait
+				if all(x in line for x in strings2):
+					# Parse the string to get important values
+					event = re.search('^([0-9]+)', line).group(1)
+					event = int(event)
+					grp = re.search('\]: \] \((\d+.\d+), (\d+)\) \((\d+.\d+), (\d+)\)', line)
+					source = int(grp.group(2))
+					dest = int(grp.group(2))
+					t_grp = re.search('TimeBBox\((\d+.\d+),(\d+.\d+)\)', line)
+					tBBox = [float(t_grp.group(1)), float(t_grp.group(2))]
+
+					# Assemble the dictionary and add to defaultdict(defaultdict(OOBtree))
+					attr_dict = {'dest':dest, 'tBBox_s':tBBox[0],
+									'tBBox_e':tBBox[1]}
+
+					rank_dict[source]['MPI_Wait'][event] = attr_dict
+
+					# Now add node to nascent graph.
+					node_name = '_'.join((str(source), str(event)))
+					G.add_node(node_name)
+
+		print nx.number_of_nodes(G)
+
+
 
 
 		
@@ -67,5 +98,4 @@ if __name__ == "__main__":
 
 	D = DAG(args.in_file)
 	A = D.slog2Dict()
-
 
