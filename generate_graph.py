@@ -96,8 +96,13 @@ class DAG(object):
                 # Find out which came next, Wait or Send on destination
                 next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
                 next_wait = rank_dict[my_dest]['MPI_Wait'].minKey(evnt)
+                next_send_1 = rank_dict[my_dest]['MPI_Send'].minKey(next_send)
+                
+                my_send_t = rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_e']
+                next_send_t = rank_dict[my_dest]['MPI_Send'][next_send]['tBBox_e']
+                next_wait_t = rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_s']
 
-                if next_send < next_wait:
+                if my_send_t <= next_send_t:
                     delta_t = rank_dict[my_dest]['MPI_Send'][next_send]['tBBox_e'] \
                             - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
                     source_name = '_'.join((str(src_rank), str(evnt)))
@@ -115,9 +120,9 @@ class DAG(object):
                     G.add_edge(source_name, wait_name, weight=delta_t_w)
 
                     # Now add edge from next_wait to next_send
-                    delta_t_s = rank_dict[my_dest]['MPI_Send'][next_send]['tBBox_s'] \
+                    delta_t_s = rank_dict[my_dest]['MPI_Send'][next_send_1]['tBBox_s'] \
                                 - rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_e']
-                    send_name = '_'.join((str(my_dest), str(next_send)))
+                    send_name = '_'.join((str(my_dest), str(next_send_1)))
 
                     G.add_edge(wait_name, send_name, weight=delta_t_s)
 
