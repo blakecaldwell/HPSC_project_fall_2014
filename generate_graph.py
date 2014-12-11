@@ -9,13 +9,14 @@ import sys
 import re
 import argparse
 import json
+import itertools
 import networkx as nx
 #from BTrees.OOBTree import OOBTree
 from collections import defaultdict
+from networkx.readwrite import json_graph
 
 sys.path.append('/home/dami9546/zodb/lib/python2.7/site-packages')
 from BTrees.OOBTree import OOBTree
-import itertools
 
 class DAG(object):
     """docstring for DAG"""
@@ -34,9 +35,8 @@ class DAG(object):
         with open(self.filename, 'r') as infile:
             strings1 = ("name=MPI_Send()", "Primitive")
             strings2 = ("name=MPI_Wait()", "Primitive")
-            N = 1000000
-            for line in itertools.islice(infile, N):
-       #     for line in infile:
+
+            for line in infile:
 
                 # Do for MPI_Send
                 if all(x in line for x in strings1):
@@ -56,7 +56,6 @@ class DAG(object):
                                     'tBBox_e':tBBox[1]}
 
                     rank_dict[source]['MPI_Send'][event] = attr_dict
-
                     # Now add node to nascent graph.
                     node_name = '_'.join((str(source), str(event)))
                     G.add_node(node_name)
@@ -77,7 +76,6 @@ class DAG(object):
                                     'tBBox_e':tBBox[1]}
 
                     rank_dict[source]['MPI_Wait'][event] = attr_dict
-
                     # Now add node to nascent graph.
                     node_name = '_'.join((str(source), str(event)))
                     G.add_node(node_name)
@@ -92,17 +90,17 @@ class DAG(object):
             # Now loop over events
             for evnt in rank_dict[src_rank]['MPI_Send']:
                 my_dest = rank_dict[src_rank]['MPI_Send'][evnt]['dest']
-
+              #  print type(rank_dict[src_rank]['MPI_Send'])
                 try:
                     next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
                 except ValueError:
                     if evnt > rank_dict[my_dest]['MPI_Send'].maxKey():
-                        next_send = rank_dict[my_dest]['MPI_Send'].maxKey()
+                        pass#    next_send = rank_dict[my_dest]['MPI_Send'].maxKey()
                 try:
                     next_wait = rank_dict[my_dest]['MPI_Wait'].minKey(evnt)
                 except ValueError:
                    if evnt > rank_dict[my_dest]['MPI_Wait'].maxKey():
-                       next_wait = rank_dict[my_dest]['MPI_Wait'].maxKey()
+                       pass#  next_wait = rank_dict[my_dest]['MPI_Wait'].maxKey()
                 try:
                     next_send_1 = rank_dict[my_dest]['MPI_Send'].minKey(next_send)
                 except ValueError:
@@ -122,19 +120,19 @@ class DAG(object):
 
                 # Else wait fulfilled first- means path remains on this node
                 else:
-                    delta_t_w = rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_e'] \
-                                - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
-                    source_name = '_'.join((str(src_rank), str(evnt)))
-                    wait_name = '_'.join((str(my_dest), str(next_wait)))
+                    #delta_t_w = rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_e'] \
+                    #            - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
+                    #source_name = '_'.join((str(src_rank), str(evnt)))
+                    #wait_name = '_'.join((str(my_dest), str(next_wait)))
 
-                    G.add_edge(source_name, wait_name, weight=delta_t_w)
+                    #G.add_edge(source_name, wait_name, weight=delta_t_w)
 
                     # Now add edge from next_wait to next_send
-                    delta_t_s = rank_dict[my_dest]['MPI_Send'][next_send_1]['tBBox_s'] \
-                                - rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_e']
-                    send_name = '_'.join((str(my_dest), str(next_send_1)))
+                    delta_t_s = rank_dict[my_dest]['MPI_Send'][next_send_1]['tBBox_e'] \
+                                - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
+                    send_name = '_'.join((str(src_rank), str(next_send_1)))
 
-                    G.add_edge(wait_name, send_name, weight=delta_t_s)
+                    G.add_edge(source_name, send_name, weight=delta_t_s)
 
         return G
 
@@ -172,20 +170,25 @@ if __name__ == "__main__":
                         help="read slog2 text FILE", metavar="FILE")
     parser.add_argument("-o", dest="out_file",
                         help="write DAG to JSON FILE", metavar="FILE")
+    parser.add_argument("-j", dest="crit_file",
+                        help="write critical path to JSON FILE", metavar="FILE")
+
 
     args = parser.parse_args()
 
     D = DAG(args.in_file)
     Grf, H = D.slog2Dict()
     I = D.connectGraph(Grf,H)
+    crit_path = D.find_critical(Grf)
 
-    #print D.find_critical(Grf)
+    with open(args.crit_file, 'w') as c:
+      json.dump(crit_path, c)
+
     for cycle in nx.simple_cycles(Grf):
         print cycle
 
-    from networkx.readwrite import json_graph
 
     graph_data = json_graph.node_link_data(I)
     
     with open(args.out_file, 'w') as f:
-        json.dump(graph_data, f, indent=4)
+        json.dump(graph_data, f, indent=2)
