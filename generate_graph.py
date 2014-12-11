@@ -14,6 +14,7 @@ import networkx as nx
 #from BTrees.OOBTree import OOBTree
 from collections import defaultdict
 from networkx.readwrite import json_graph
+import matplotlib.pyplot as plt
 
 sys.path.append('/home/dami9546/zodb/lib/python2.7/site-packages')
 from BTrees.OOBTree import OOBTree
@@ -90,7 +91,6 @@ class DAG(object):
             # Now loop over events
             for evnt in rank_dict[src_rank]['MPI_Send']:
                 my_dest = rank_dict[src_rank]['MPI_Send'][evnt]['dest']
-              #  print type(rank_dict[src_rank]['MPI_Send'])
                 try:
                     next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
                 except ValueError:
@@ -115,7 +115,6 @@ class DAG(object):
                             - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
                     source_name = '_'.join((str(src_rank), str(evnt)))
                     dest_name = '_'.join((str(my_dest), str(next_send)))
-
                     G.add_edge(source_name, dest_name, weight=delta_t)
 
                 # Else wait fulfilled first- means path remains on this node
@@ -130,14 +129,14 @@ class DAG(object):
                     # Now add edge from next_wait to next_send
                     delta_t_s = rank_dict[my_dest]['MPI_Send'][next_send_1]['tBBox_e'] \
                                 - rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_s']
-                    send_name = '_'.join((str(src_rank), str(next_send_1)))
-
+                    send_name = '_'.join((str(my_dest), str(next_send_1)))
+                    
                     G.add_edge(source_name, send_name, weight=delta_t_s)
 
         return G
 
 
-    # Now compute the critical (longest) path graph.
+    # Now compute the critical (longest) path graph. Copied from StackOverflow
     def find_critical(self, G):
         dist = {} # stores [node, distance] pair
 
@@ -179,16 +178,16 @@ if __name__ == "__main__":
     D = DAG(args.in_file)
     Grf, H = D.slog2Dict()
     I = D.connectGraph(Grf,H)
-    crit_path = D.find_critical(Grf)
+    crit_path = D.find_critical(I)
 
-    with open(args.crit_file, 'w') as c:
-      json.dump(crit_path, c)
+#    print crit_path
+    with open(args.crit_file, 'wb') as c:
+        crit_path = map(lambda x:x+'\n', crit_path)
+        c.writelines(crit_path)
 
-    for cycle in nx.simple_cycles(Grf):
-        print cycle
+#    for cycle in nx.simple_cycles(Grf):
+#        print cycle
+    graph_data = json_graph.node_link_data(I) 
 
-
-    graph_data = json_graph.node_link_data(I)
-    
     with open(args.out_file, 'w') as f:
-        json.dump(graph_data, f, indent=2)
+        json.dump(graph_data, f)
