@@ -10,9 +10,11 @@ import re
 import argparse
 import json
 import networkx as nx
-from BTrees.OOBTree import OOBTree
+#from BTrees.OOBTree import OOBTree
 from collections import defaultdict
 
+sys.path.append('/home/dami9546/zodb/lib/python2.7/site-packages')
+from BTrees.OOBTree import OOBTree
 
 class DAG(object):
     """docstring for DAG"""
@@ -23,7 +25,7 @@ class DAG(object):
 
     def slog2Dict(self):
         # Defaultdict must be callable, so use lambda
-        rank_dict = defaultdict(lambda: defaultdict(dict))
+        rank_dict = rank_dict = defaultdict(lambda: defaultdict(lambda: OOBTree()))
 
         # Initialize the graph
         G = nx.DiGraph()
@@ -31,9 +33,6 @@ class DAG(object):
         with open(self.filename, 'r') as infile:
             strings1 = ("name=MPI_Send()", "Primitive")
             strings2 = ("name=MPI_Wait()", "Primitive")
-
-            # Again, must be callable, so use lambda for OOBTree
-            op_dict = defaultdict(lambda: defaultdict(OOBTree()))
 
             for line in infile:
 
@@ -81,8 +80,12 @@ class DAG(object):
                     node_name = '_'.join((str(source), str(event)))
                     G.add_node(node_name)
 
+        print rank_dict[source]['MPI_Wait'].minKey()
+        print rank_dict[source]['MPI_Wait'].maxKey()
+        print rank_dict[source]['MPI_Send'].minKey()
+        print rank_dict[source]['MPI_Send'].maxKey()
+        print nx.number_of_nodes(G)
         return G, rank_dict
-#       print nx.number_of_nodes(G)
 
 
     def connectGraph(self, G, rank_dict):
@@ -166,8 +169,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     D = DAG(args.in_file)
-    G, D = D.slog2Dict()
-    F = D.connectGraph(G,D)
+    Grf, H = D.slog2Dict()
+    I = D.connectGraph(Grf,H)
 
     from networkx.readwrite import json_graph
 
