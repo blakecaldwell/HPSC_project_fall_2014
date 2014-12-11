@@ -15,6 +15,7 @@ from collections import defaultdict
 
 sys.path.append('/home/dami9546/zodb/lib/python2.7/site-packages')
 from BTrees.OOBTree import OOBTree
+import itertools
 
 class DAG(object):
     """docstring for DAG"""
@@ -33,8 +34,9 @@ class DAG(object):
         with open(self.filename, 'r') as infile:
             strings1 = ("name=MPI_Send()", "Primitive")
             strings2 = ("name=MPI_Wait()", "Primitive")
-
-            for line in infile:
+            N = 1000000
+            for line in itertools.islice(infile, N):
+       #     for line in infile:
 
                 # Do for MPI_Send
                 if all(x in line for x in strings1):
@@ -80,11 +82,6 @@ class DAG(object):
                     node_name = '_'.join((str(source), str(event)))
                     G.add_node(node_name)
 
-        print rank_dict[source]['MPI_Wait'].minKey()
-        print rank_dict[source]['MPI_Wait'].maxKey()
-        print rank_dict[source]['MPI_Send'].minKey()
-        print rank_dict[source]['MPI_Send'].maxKey()
-        print nx.number_of_nodes(G)
         return G, rank_dict
 
 
@@ -96,10 +93,20 @@ class DAG(object):
             for evnt in rank_dict[src_rank]['MPI_Send']:
                 my_dest = rank_dict[src_rank]['MPI_Send'][evnt]['dest']
 
-                # Find out which came next, Wait or Send on destination
-                next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
-                next_wait = rank_dict[my_dest]['MPI_Wait'].minKey(evnt)
-                next_send_1 = rank_dict[my_dest]['MPI_Send'].minKey(next_send)
+                try:
+                    next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
+                except ValueError:
+                    if evnt > rank_dict[my_dest]['MPI_Send'].maxKey():
+                        next_send = rank_dict[my_dest]['MPI_Send'].maxKey()
+                try:
+                    next_wait = rank_dict[my_dest]['MPI_Wait'].minKey(evnt)
+                except ValueError:
+                   if evnt > rank_dict[my_dest]['MPI_Wait'].maxKey():
+                       next_wait = rank_dict[my_dest]['MPI_Wait'].maxKey()
+                try:
+                    next_send_1 = rank_dict[my_dest]['MPI_Send'].minKey(next_send)
+                except ValueError:
+                    pass
                 
                 my_send_t = rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_e']
                 next_send_t = rank_dict[my_dest]['MPI_Send'][next_send]['tBBox_e']
@@ -172,9 +179,13 @@ if __name__ == "__main__":
     Grf, H = D.slog2Dict()
     I = D.connectGraph(Grf,H)
 
+    #print D.find_critical(Grf)
+    for cycle in nx.simple_cycles(Grf):
+        print cycle
+
     from networkx.readwrite import json_graph
 
-    graph_data = json_graph.node_link_data(F)
+    graph_data = json_graph.node_link_data(I)
     
     with open(args.out_file, 'w') as f:
         json.dump(graph_data, f, indent=4)
