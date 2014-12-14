@@ -10,18 +10,13 @@ import glob
 import re
 import argparse
 import json
-import itertools
+import logging
 import networkx as nx
-#from BTrees.OOBTree import OOBTree
 from collections import defaultdict
 from networkx.readwrite import json_graph
-import logging
 sys.path.append('/home/dami9546/zodb/lib/python2.7/site-packages')
 from BTrees.OOBTree import OOBTree
 from BTrees.check import check
-
-logging.basicConfig(filename='/projects/dami9546/HPSC/final/hostgraph_test.out',format='%(asctime)s %(message)s',level=logging.DEBUG)
-logging.info('Starting graph script')
 
 class DAG(object):
     """docstring for DAG"""
@@ -32,12 +27,16 @@ class DAG(object):
         self.host_mapping = host_mapping
 
         global mapping_dict
-        mapping_dict = {} 
+        mapping_dict = {}
+        strings = ("Hostname:", "Cart_rank:")
         with open(self.host_mapping, 'r') as map:
             for line in map:
-                (val, key) = line.split()
-                mapping_dict[int(key)] = val
-                
+                if all(x in line for x in strings):
+                    hostname = re.search('Hostname:(\w+\d+)', line)
+                    rank = re.search('Cart_rank:\s+(\d+)', line)
+                    hostname = hostname.group(1)
+                    rank = int(rank.group(1))
+                    mapping_dict[rank] = hostname
 
     def slog2Dict(self):
         # Defaultdict must be callable, so use lambda
@@ -66,7 +65,6 @@ class DAG(object):
                     # Assemble the dictionary and add to defaultdict(defaultdict(OOBtree))
                     attr_dict = {'dest':dest, 'msg_size':size, 'tBBox_s':tBBox[0],
                                     'tBBox_e':tBBox[1], 'event':event}
-           #         logging.info("send time: %f" % tBBox[1])
                     rank_dict[source]['MPI_Send'][tBBox[1]] = attr_dict
                     # Now add node to nascent graph.
                     host = mapping_dict[source]
@@ -87,7 +85,6 @@ class DAG(object):
                     # Assemble the dictionary and add to defaultdict(defaultdict(OOBtree))
                     attr_dict = {'dest':dest, 'tBBox_s':tBBox[0],
                                     'tBBox_e':tBBox[1], 'event': event}
-#                    logging.info("wait time: %d" % tBBox[1])
                     rank_dict[source]['MPI_Wait'][tBBox[1]] = attr_dict
                     # Now add node to nascent graph.
                     host = mapping_dict[source]
@@ -98,46 +95,25 @@ class DAG(object):
 
 
     def connectGraph(self, G, rank_dict):
-        epsilon = sys.float_info.epsilon
         # Iterate over MPI_Send() nodes
         for src_rank in rank_dict.keys():
-          #  logging.info("src_rank: %d" % src_rank)
             # Now loop over events
             for evnt in rank_dict[src_rank]['MPI_Send']:
                 my_dest = rank_dict[src_rank]['MPI_Send'][evnt]['dest']
-              #  logging.info('event number: %d' % evnt)
                 try:
                     next_send = rank_dict[my_dest]['MPI_Send'].minKey(evnt)
-                  #  logging.info('next_send: %d' % next_send)
                 except ValueError:
-                    if evnt > rank_dict[my_dest]['MPI_Send'].maxKey():
-                        pass#    next_send = rank_dict[my_dest]['MPI_Send'].maxKey()
+                    pass
                 try:
                     next_wait = rank_dict[my_dest]['MPI_Wait'].minKey(evnt)
-                  #  logging.info('next_wait: %d' % next_wait)
                 except ValueError:
-                   if evnt > rank_dict[my_dest]['MPI_Wait'].maxKey():
-                       pass#  next_wait = rank_dict[my_dest]['MPI_Wait'].maxKey()
-#                try:
-#                    greater_key = max(next_wait, next_send+epsilon)
-#                    next_send_1 = rank_dict[my_dest]['MPI_Send'].minKey(greater_key + epsilon)
-                   # logging.info('next_send_1: %d' % next_send_1)
-#                except ValueError:
-#                    pass
-#                try:
-#                    my_send_t = rank_dict[src_rank]['MPI_Send'][evnt]['tBBox_e']
-#                    next_send_t = rank_dict[my_dest]['MPI_Send'][next_send]['tBBox_e']
-#                    next_wait_t = rank_dict[my_dest]['MPI_Wait'][next_wait]['tBBox_e']
-#                except:
-#                    pass
+                   pass
 
                 if evnt <= next_send <= next_wait:
-#                    logging.info("my send time: %d next send t: %d" % (evnt, next_send))
                     try:
                         delta_t = next_send - evnt
                         source_name = '_'.join((str(mapping_dict[src_rank]), str(evnt)))
                         dest_name = '_'.join((str(mapping_dict[my_dest]), str(next_send)))
-                    #    logging.info("my send < next send t")
                         G.add_edge(source_name, dest_name, weight=delta_t)
 
                     except:
@@ -145,8 +121,6 @@ class DAG(object):
 
                 # Else wait fulfilled first- means path remains on this node
                 elif evnt <= next_wait <= next_send:
-                  #  logging.info("my send < next wait")
-                  #  logging.info("my send time: %d next wait t: %d" % (evnt, next_wait))
                     try:
                         delta_t_w = next_wait - evnt
                         source_name = '_'.join((str(mapping_dict[src_rank]), str(evnt)))
@@ -159,7 +133,6 @@ class DAG(object):
                     try:
                         delta_t_s = next_send - next_wait
                         send_name = '_'.join((str(mapping_dict[my_dest]), str(next_send)))
-                #        logging.info("connecting to send_1") 
                         G.add_edge(wait_name, send_name, weight=delta_t_s)
                     except:
                         pass
@@ -168,7 +141,7 @@ class DAG(object):
                     G.add_edge(source_name, end_name, weight=0.0)
 
                 else:
-                    logging.error("order's fucked up!")
+                    logging.error("order's screwed up!")
                     logging.info("my send time: %f, my next send: %f, my next wait: %f" % (evnt, next_send, next_wait))
                     logging.info("max send time: %f, max next send: %f, max next wait: %f" % (rank_dict[src_rank]['MPI_Send'].maxKey(), \
                                  rank_dict[my_dest]['MPI_Send'].maxKey(),rank_dict[my_dest]['MPI_Wait'].maxKey()))
@@ -217,10 +190,14 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
+    logging.basicConfig(filename='/projects/dami9546/HPSC/final/hostgraph_test2120.out', \
+                        format='%(asctime)s %(message)s',level=logging.DEBUG)
+    logging.info('Starting graph script')
+
     D = DAG(args.in_file, args.host_mapping)
     Grf, H = D.slog2Dict()
     I = D.connectGraph(Grf,H)
-#    print "Next line is output of check"
+
     for i in H.keys():
         logging.info("type of rank_dict[i]['MPI_Send']: %s" % (type(H[i]['MPI_Send'])))
         logging.info("type of rank_dict[i]['MPI_Wait']: %s" % (type(H[i]['MPI_Wait'])))
@@ -233,9 +210,6 @@ if __name__ == "__main__":
         except:
             logging.info('my type: %s' % type(i))
             logging.error('%d is corrupt' % i)
-#
-#    for cycle in nx.simple_cycles(I):
-#        logging.info(cycle)
     logging.info("DAG size: %d" % (I.size()))
     logging.info("DAG numnodes %d" % (len(I)))
     logging.info("number of self-loops: %d" % (I.number_of_selfloops()))
