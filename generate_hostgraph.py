@@ -40,7 +40,7 @@ class DAG(object):
 
     def slog2Dict(self):
         # Defaultdict must be callable, so use lambda
-        rank_dict = rank_dict = defaultdict(lambda: defaultdict(lambda: OOBTree(dict())))
+        rank_dict = defaultdict(lambda: defaultdict(lambda: OOBTree(dict())))
 
         # Initialize the graph
         G = nx.DiGraph()
